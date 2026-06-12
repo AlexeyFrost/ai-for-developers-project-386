@@ -180,17 +180,59 @@ model CreatedBookingResponse {
   body: Booking;
 }
 
+@doc("Successful event type deletion response. Existing bookings for this event type are not deleted.")
+model DeletedEventTypeResponse {
+  @statusCode
+  statusCode: 204;
+}
+
 @doc("Get public information about the calendar owner.")
+@opExample(
+  #{
+    returnType: #{
+      id: "owner-alexey",
+      name: "Alexey Morozov",
+      description: "Выберите удобное время для звонка.",
+      timezone: "Europe/Moscow",
+    },
+  },
+  #{ title: "Default owner" }
+)
 @route("/owner")
 @get
 op getOwner(): Owner;
 
 @doc("Get event types available to guests.")
+@opExample(
+  #{
+    returnType: #[
+      #{
+        id: "meeting-30",
+        title: "Встреча 30 минут",
+        description: "Короткий созвон для обсуждения задачи или вопроса.",
+        durationMinutes: 30,
+      }
+    ],
+  },
+  #{ title: "Default event types" }
+)
 @route("/event-types")
 @get
 op listEventTypes(): EventType[];
 
 @doc("Get one event type by identifier.")
+@opExample(
+  #{
+    parameters: #{ eventTypeId: "meeting-30" },
+    returnType: #{
+      id: "meeting-30",
+      title: "Встреча 30 минут",
+      description: "Короткий созвон для обсуждения задачи или вопроса.",
+      durationMinutes: 30,
+    },
+  },
+  #{ title: "Default event type" }
+)
 @route("/event-types/{eventTypeId}")
 @get
 op getEventType(
@@ -200,6 +242,104 @@ op getEventType(
 ): EventType | NotFoundResponse;
 
 @doc("Get slots for the selected event type for the next 14 days from the current date. Slots are generated from the event type duration during the owner's working hours, 09:00-18:00 by default, in Owner.timezone. The response includes both available and booked slots.")
+@opExample(
+  #{
+    parameters: #{ eventTypeId: "meeting-30" },
+    returnType: #[
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T09:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T09:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T09:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T10:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T10:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T10:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T10:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T11:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T11:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T11:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T11:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T12:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T12:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T12:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T12:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T13:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T13:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T13:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T13:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T14:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T14:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T14:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T14:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T15:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T15:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T15:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T15:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T16:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T16:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T16:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T16:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T17:00:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T17:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T17:30:00+03:00"),
+        status: SlotStatus.available,
+      },
+      #{
+        startTime: offsetDateTime.fromISO("2026-06-12T17:30:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T18:00:00+03:00"),
+        status: SlotStatus.available,
+      }
+    ],
+  },
+  #{ title: "Default slots" }
+)
 @route("/event-types/{eventTypeId}/slots")
 @get
 op listEventTypeSlots(
@@ -209,6 +349,38 @@ op listEventTypeSlots(
 ): Slot[] | NotFoundResponse;
 
 @doc("Create a booking for a free slot. The server calculates endTime from the selected event type duration. A booking cannot be created if its interval overlaps any existing booking, even for a different event type.")
+@opExample(
+  #{
+    parameters: #{
+      request: #{
+        eventTypeId: "meeting-30",
+        startTime: offsetDateTime.fromISO("2026-06-12T09:00:00+03:00"),
+        guestName: "Ivan",
+        guestEmail: "ivan@example.com",
+        guestNote: "Хочу обсудить задачу.",
+      },
+    },
+    returnType: #{
+      statusCode: 201,
+      body: #{
+        id: "booking-1",
+        eventType: #{
+          id: "meeting-30",
+          title: "Встреча 30 минут",
+          description: "Короткий созвон для обсуждения задачи или вопроса.",
+          durationMinutes: 30,
+        },
+        guestName: "Ivan",
+        guestEmail: "ivan@example.com",
+        guestNote: "Хочу обсудить задачу.",
+        startTime: offsetDateTime.fromISO("2026-06-12T09:00:00+03:00"),
+        endTime: offsetDateTime.fromISO("2026-06-12T09:30:00+03:00"),
+        createdAt: offsetDateTime.fromISO("2026-06-12T08:00:00+03:00"),
+      },
+    },
+  },
+  #{ title: "Created booking" }
+)
 @route("/bookings")
 @post
 op createBooking(
@@ -217,6 +389,27 @@ op createBooking(
 ): CreatedBookingResponse | NotFoundResponse | ConflictResponse | ValidationErrorResponse;
 
 @doc("Create an event type in the owner admin area. No authentication is modeled in this contract.")
+@opExample(
+  #{
+    parameters: #{
+      request: #{
+        title: "Встреча 15 минут",
+        description: "Быстрый созвон для короткого вопроса.",
+        durationMinutes: 15,
+      },
+    },
+    returnType: #{
+      statusCode: 201,
+      body: #{
+        id: "meeting-15",
+        title: "Встреча 15 минут",
+        description: "Быстрый созвон для короткого вопроса.",
+        durationMinutes: 15,
+      },
+    },
+  },
+  #{ title: "Created event type" }
+)
 @route("/admin/event-types")
 @post
 op createAdminEventType(
@@ -225,11 +418,44 @@ op createAdminEventType(
 ): CreatedEventTypeResponse | ValidationErrorResponse;
 
 @doc("Get all event types in the owner admin area. No authentication is modeled in this contract.")
+@opExample(
+  #{
+    returnType: #[
+      #{
+        id: "meeting-30",
+        title: "Встреча 30 минут",
+        description: "Короткий созвон для обсуждения задачи или вопроса.",
+        durationMinutes: 30,
+      }
+    ],
+  },
+  #{ title: "Default admin event types" }
+)
 @route("/admin/event-types")
 @get
 op listAdminEventTypes(): EventType[];
 
+@doc("Delete an event type in the owner admin area. Existing bookings for this event type remain available in the admin bookings list. No authentication is modeled in this contract.")
+@opExample(
+  #{
+    parameters: #{ eventTypeId: "meeting-30" },
+    returnType: #{ statusCode: 204 },
+  },
+  #{ title: "Deleted event type" }
+)
+@route("/admin/event-types/{eventTypeId}")
+@delete
+op deleteAdminEventType(
+  @doc("Event type identifier.")
+  @path
+  eventTypeId: string,
+): DeletedEventTypeResponse | NotFoundResponse;
+
 @doc("Get upcoming bookings across all event types in the owner admin area, sorted by startTime in ascending order. No authentication is modeled in this contract.")
+@opExample(
+  #{ returnType: #[] },
+  #{ title: "No upcoming bookings" }
+)
 @route("/admin/bookings")
 @get
 op listAdminBookings(): Booking[];

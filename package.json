@@ -5,9 +5,11 @@
   "description": "TypeSpec API contract for call booking.",
   "scripts": {
     "tsp:compile": "tsp compile spec/main.tsp",
-    "openapi": "npm run tsp:compile"
+    "openapi": "npm run tsp:compile",
+    "mock:api": "prism mock tsp-output/schema/openapi.yaml --host 0.0.0.0 --port 4010"
   },
   "devDependencies": {
+    "@stoplight/prism-cli": "5.14.2",
     "@typespec/compiler": "^1.13.0",
     "@typespec/http": "^1.13.0",
     "@typespec/openapi3": "^1.13.0"

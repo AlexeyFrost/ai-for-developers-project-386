@@ -19,6 +19,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Booking'
+              examples:
+                No upcoming bookings:
+                  summary: No upcoming bookings
+                  value: []
   /admin/event-types:
     post:
       operationId: createAdminEventType
@@ -31,6 +35,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventType'
+              examples:
+                Created event type:
+                  summary: Created event type
+                  value:
+                    id: meeting-15
+                    title: Встреча 15 минут
+                    description: Быстрый созвон для короткого вопроса.
+                    durationMinutes: 15
         '422':
           description: Request data is invalid or the requested slot is outside the 14-day booking window.
           content:
@@ -43,6 +55,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEventTypeRequest'
+            examples:
+              Created event type:
+                summary: Created event type
+                value:
+                  title: Встреча 15 минут
+                  description: Быстрый созвон для короткого вопроса.
+                  durationMinutes: 15
     get:
       operationId: listAdminEventTypes
       description: Get all event types in the owner admin area. No authentication is modeled in this contract.
@@ -56,6 +75,34 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EventType'
+              examples:
+                Default admin event types:
+                  summary: Default admin event types
+                  value:
+                    - id: meeting-30
+                      title: Встреча 30 минут
+                      description: Короткий созвон для обсуждения задачи или вопроса.
+                      durationMinutes: 30
+  /admin/event-types/{eventTypeId}:
+    delete:
+      operationId: deleteAdminEventType
+      description: Delete an event type in the owner admin area. Existing bookings for this event type remain available in the admin bookings list. No authentication is modeled in this contract.
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          description: Event type identifier.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful event type deletion response. Existing bookings for this event type are not deleted.
+        '404':
+          description: Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /bookings:
     post:
       operationId: createBooking
@@ -68,6 +115,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
+              examples:
+                Created booking:
+                  summary: Created booking
+                  value:
+                    id: booking-1
+                    eventType:
+                      id: meeting-30
+                      title: Встреча 30 минут
+                      description: Короткий созвон для обсуждения задачи или вопроса.
+                      durationMinutes: 30
+                    guestName: Ivan
+                    guestEmail: ivan@example.com
+                    guestNote: Хочу обсудить задачу.
+                    startTime: '2026-06-12T09:00:00+03:00'
+                    endTime: '2026-06-12T09:30:00+03:00'
+                    createdAt: '2026-06-12T08:00:00+03:00'
         '404':
           description: Resource was not found.
           content:
@@ -92,6 +155,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBookingRequest'
+            examples:
+              Created booking:
+                summary: Created booking
+                value:
+                  eventTypeId: meeting-30
+                  startTime: '2026-06-12T09:00:00+03:00'
+                  guestName: Ivan
+                  guestEmail: ivan@example.com
+                  guestNote: Хочу обсудить задачу.
   /event-types:
     get:
       operationId: listEventTypes
@@ -106,6 +178,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EventType'
+              examples:
+                Default event types:
+                  summary: Default event types
+                  value:
+                    - id: meeting-30
+                      title: Встреча 30 минут
+                      description: Короткий созвон для обсуждения задачи или вопроса.
+                      durationMinutes: 30
   /event-types/{eventTypeId}:
     get:
       operationId: getEventType
@@ -124,6 +204,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventType'
+              examples:
+                Default event type:
+                  summary: Default event type
+                  value:
+                    id: meeting-30
+                    title: Встреча 30 минут
+                    description: Короткий созвон для обсуждения задачи или вопроса.
+                    durationMinutes: 30
         '404':
           description: Resource was not found.
           content:
@@ -150,6 +238,64 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Slot'
+              examples:
+                Default slots:
+                  summary: Default slots
+                  value:
+                    - startTime: '2026-06-12T09:00:00+03:00'
+                      endTime: '2026-06-12T09:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T09:30:00+03:00'
+                      endTime: '2026-06-12T10:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T10:00:00+03:00'
+                      endTime: '2026-06-12T10:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T10:30:00+03:00'
+                      endTime: '2026-06-12T11:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T11:00:00+03:00'
+                      endTime: '2026-06-12T11:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T11:30:00+03:00'
+                      endTime: '2026-06-12T12:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T12:00:00+03:00'
+                      endTime: '2026-06-12T12:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T12:30:00+03:00'
+                      endTime: '2026-06-12T13:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T13:00:00+03:00'
+                      endTime: '2026-06-12T13:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T13:30:00+03:00'
+                      endTime: '2026-06-12T14:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T14:00:00+03:00'
+                      endTime: '2026-06-12T14:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T14:30:00+03:00'
+                      endTime: '2026-06-12T15:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T15:00:00+03:00'
+                      endTime: '2026-06-12T15:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T15:30:00+03:00'
+                      endTime: '2026-06-12T16:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T16:00:00+03:00'
+                      endTime: '2026-06-12T16:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T16:30:00+03:00'
+                      endTime: '2026-06-12T17:00:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T17:00:00+03:00'
+                      endTime: '2026-06-12T17:30:00+03:00'
+                      status: available
+                    - startTime: '2026-06-12T17:30:00+03:00'
+                      endTime: '2026-06-12T18:00:00+03:00'
+                      status: available
         '404':
           description: Resource was not found.
           content:
@@ -168,6 +314,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Owner'
+              examples:
+                Default owner:
+                  summary: Default owner
+                  value:
+                    id: owner-alexey
+                    name: Alexey Morozov
+                    description: Выберите удобное время для звонка.
+                    timezone: Europe/Moscow
 components:
   schemas:
     ApiError:
