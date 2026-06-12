@@ -1,0 +1,347 @@
+openapi: 3.0.0
+info:
+  title: Call Booking API
+  description: API contract for scheduling calls with a single calendar owner.
+  version: 0.0.0
+tags: []
+paths:
+  /admin/bookings:
+    get:
+      operationId: listAdminBookings
+      description: Get upcoming bookings across all event types in the owner admin area, sorted by startTime in ascending order. No authentication is modeled in this contract.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+  /admin/event-types:
+    post:
+      operationId: createAdminEventType
+      description: Create an event type in the owner admin area. No authentication is modeled in this contract.
+      parameters: []
+      responses:
+        '201':
+          description: Successful event type creation response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '422':
+          description: Request data is invalid or the requested slot is outside the 14-day booking window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventTypeRequest'
+    get:
+      operationId: listAdminEventTypes
+      description: Get all event types in the owner admin area. No authentication is modeled in this contract.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+  /bookings:
+    post:
+      operationId: createBooking
+      description: Create a booking for a free slot. The server calculates endTime from the selected event type duration. A booking cannot be created if its interval overlaps any existing booking, even for a different event type.
+      parameters: []
+      responses:
+        '201':
+          description: Successful booking creation response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Requested slot is already booked or overlaps an existing booking interval.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          description: Request data is invalid or the requested slot is outside the 14-day booking window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+  /event-types:
+    get:
+      operationId: listEventTypes
+      description: Get event types available to guests.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+  /event-types/{eventTypeId}:
+    get:
+      operationId: getEventType
+      description: Get one event type by identifier.
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          description: Event type identifier.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '404':
+          description: Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /event-types/{eventTypeId}/slots:
+    get:
+      operationId: listEventTypeSlots
+      description: Get slots for the selected event type for the next 14 days from the current date. Slots are generated from the event type duration during the owner's working hours, 09:00-18:00 by default, in Owner.timezone. The response includes both available and booked slots.
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          description: Event type identifier.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
+        '404':
+          description: Resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /owner:
+    get:
+      operationId: getOwner
+      description: Get public information about the calendar owner.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Owner'
+components:
+  schemas:
+    ApiError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Stable application error code.
+        message:
+          type: string
+          description: Human-readable error message.
+        details:
+          type: array
+          items:
+            type: string
+          description: Optional validation or conflict details.
+      description: Common error response body.
+    Booking:
+      type: object
+      required:
+        - id
+        - eventType
+        - guestName
+        - guestEmail
+        - startTime
+        - endTime
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Unique booking identifier.
+        eventType:
+          allOf:
+            - $ref: '#/components/schemas/EventType'
+          description: Selected event type.
+        guestName:
+          type: string
+          description: Guest display name.
+        guestEmail:
+          type: string
+          format: email
+          description: Guest email address.
+        guestNote:
+          type: string
+          description: Optional note from the guest.
+        startTime:
+          type: string
+          format: date-time
+          description: Booking start time as an ISO 8601 date-time.
+        endTime:
+          type: string
+          format: date-time
+          description: Booking end time as an ISO 8601 date-time.
+        createdAt:
+          type: string
+          format: date-time
+          description: Booking creation time as an ISO 8601 date-time.
+      description: A confirmed booking.
+    CreateBookingRequest:
+      type: object
+      required:
+        - eventTypeId
+        - guestName
+        - guestEmail
+        - startTime
+      properties:
+        eventTypeId:
+          type: string
+          description: Identifier of the selected event type.
+        guestName:
+          type: string
+          description: Guest display name.
+        guestEmail:
+          type: string
+          format: email
+          description: Guest email address.
+        guestNote:
+          type: string
+          description: Optional note from the guest.
+        startTime:
+          type: string
+          format: date-time
+          description: Requested booking start time as an ISO 8601 date-time. The server calculates endTime from the selected event type duration.
+      description: Input for creating a booking.
+    CreateEventTypeRequest:
+      type: object
+      required:
+        - title
+        - description
+        - durationMinutes
+      properties:
+        title:
+          type: string
+          description: Event type title shown to guests.
+        description:
+          type: string
+          description: Event type description shown to guests.
+        durationMinutes:
+          type: integer
+          format: int32
+          description: Event duration in minutes.
+      description: Input for creating an event type.
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - durationMinutes
+      properties:
+        id:
+          type: string
+          description: Unique event type identifier.
+        title:
+          type: string
+          description: Event type title shown to guests.
+        description:
+          type: string
+          description: Event type description shown to guests.
+        durationMinutes:
+          type: integer
+          format: int32
+          description: Event duration in minutes. Slot length is derived from this value.
+      description: A type of event that can be booked by a guest.
+    Owner:
+      type: object
+      required:
+        - id
+        - name
+        - timezone
+      properties:
+        id:
+          type: string
+          description: Unique owner identifier.
+        name:
+          type: string
+          description: Display name of the calendar owner.
+        description:
+          type: string
+          description: Optional public description shown on the booking page.
+        timezone:
+          type: string
+          description: IANA timezone name used to interpret working hours, for example Europe/Moscow.
+      description: Public information about the calendar owner.
+    Slot:
+      type: object
+      required:
+        - startTime
+        - endTime
+        - status
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: Slot start time as an ISO 8601 date-time.
+        endTime:
+          type: string
+          format: date-time
+          description: Slot end time as an ISO 8601 date-time.
+        status:
+          allOf:
+            - $ref: '#/components/schemas/SlotStatus'
+          description: Current slot availability.
+      description: A potential booking interval for a selected event type.
+    SlotStatus:
+      type: string
+      enum:
+        - available
+        - booked
+      description: Slot availability status.
+servers:
+  - url: https://api.example.com
+    description: Default API endpoint
+    variables: {}

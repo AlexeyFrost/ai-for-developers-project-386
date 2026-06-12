@@ -1,0 +1,15 @@
+{
+  "name": "calendar-api-contract",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TypeSpec API contract for call booking.",
+  "scripts": {
+    "tsp:compile": "tsp compile spec/main.tsp",
+    "openapi": "npm run tsp:compile"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^1.13.0",
+    "@typespec/http": "^1.13.0",
+    "@typespec/openapi3": "^1.13.0"
+  }
+}
