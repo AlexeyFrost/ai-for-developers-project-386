@@ -14,6 +14,20 @@ function minutesToTime(minutes: number): string {
   return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
 }
 
+function getMoscowMinutes(now: Date): number {
+  const moscowDate = new Date(now.getTime() + MOSCOW_OFFSET_MINUTES * 60_000);
+  const minutes = moscowDate.getUTCHours() * 60 + moscowDate.getUTCMinutes();
+
+  return moscowDate.getUTCSeconds() > 0 || moscowDate.getUTCMilliseconds() > 0 ? minutes + 1 : minutes;
+}
+
+function roundUpToGrid(minutes: number, durationMinutes: number): number {
+  if (minutes <= WORKDAY_START_MINUTES) return WORKDAY_START_MINUTES;
+
+  const minutesAfterWorkdayStart = minutes - WORKDAY_START_MINUTES;
+  return WORKDAY_START_MINUTES + Math.ceil(minutesAfterWorkdayStart / durationMinutes) * durationMinutes;
+}
+
 function formatDateKeyFromUtcDate(date: Date): string {
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
 }
@@ -88,13 +102,17 @@ export function isInsideWorkingHours(startTime: string, durationMinutes: number)
 
 export function buildSlots(eventType: EventType, bookings: Booking[], now = new Date()): Slot[] {
   const todayKey = getTodayDateKey(now);
+  const currentMoscowMinutes = getMoscowMinutes(now);
   const slots: Slot[] = [];
 
   for (let dayIndex = 0; dayIndex < BOOKING_WINDOW_DAYS; dayIndex += 1) {
     const dateKey = addDaysToDateKey(todayKey, dayIndex);
+    const firstStartMinutes = dateKey === todayKey
+      ? roundUpToGrid(currentMoscowMinutes, eventType.durationMinutes)
+      : WORKDAY_START_MINUTES;
 
     for (
-      let startMinutes = WORKDAY_START_MINUTES;
+      let startMinutes = firstStartMinutes;
       startMinutes + eventType.durationMinutes <= WORKDAY_END_MINUTES;
       startMinutes += eventType.durationMinutes
     ) {
