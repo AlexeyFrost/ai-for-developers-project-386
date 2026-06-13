@@ -25,3 +25,7 @@
 ## Generated And CI Files
 - Do not edit, delete, or rename `.github/workflows/hexlet-check.yml`; `.github/workflows/README.md` says it is generated and used by Hexlet.
 - If `spec/main.tsp` changes, run `npm run openapi` and review the generated `tsp-output/schema/openapi.yaml`.
+
+## Commit Messages
+- Agents must follow the project commit message convention documented in `docs/commit-convention.md`.
+- Commit messages must use Conventional Commits. Do not use vague messages like `update`, `fix`, `changes`, `wip`, or `final`.
