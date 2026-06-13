@@ -7,6 +7,7 @@
 - Frontend entrypoint is `frontend/src/main.tsx`; app routes live in `frontend/src/App.tsx`; API base URL is `VITE_API_BASE_URL` in `frontend/src/api/client.ts`.
 
 ## Commands
+- Root shortcuts: `make dev` starts backend and frontend together; `make build` runs backend, frontend, and TypeSpec builds; `make check` also runs OpenAPI generation.
 - Backend dev: `cd backend && npm run dev` (defaults to `PORT=3001`; CORS allows Vite on `localhost:5173` and `127.0.0.1:5173`).
 - Frontend dev against the backend: `cd frontend && VITE_API_BASE_URL=http://localhost:3001 npm run dev`.
 - Backend verification: `cd backend && npm run build`.
