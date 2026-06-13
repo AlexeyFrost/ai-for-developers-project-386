@@ -1,4 +1,4 @@
-.PHONY: dev dev-backend dev-frontend deps build build-backend build-frontend tsp openapi check
+.PHONY: dev dev-backend dev-frontend deps build build-backend build-frontend tsp openapi test-e2e e2e-install check
 
 API_URL ?= http://localhost:3001
 
@@ -27,6 +27,12 @@ tsp:
 
 openapi:
 	npm run openapi
+
+test-e2e:
+	npm run test:e2e
+
+e2e-install:
+	npm run e2e:install
 
 build: build-backend build-frontend tsp
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Badge, Button, Card, Group, Loader, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
+import { DatePicker, type DayProps } from '@mantine/dates';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiRequestError } from '../api/client';
 import { calendarService } from '../api/calendarService';
@@ -14,6 +14,15 @@ import {
   startOfToday,
   toDateKey,
 } from '../utils/date';
+
+type CalendarDayProps = Omit<Partial<DayProps>, 'classNames' | 'styles' | 'vars'>;
+
+function getCalendarDayProps(date: Date): CalendarDayProps {
+  return {
+    'data-testid': 'calendar-day',
+    'data-date': toDateKey(date),
+  } as unknown as CalendarDayProps;
+}
 
 export function SlotPage() {
   const { eventTypeId } = useParams<{ eventTypeId: string }>();
@@ -112,11 +121,13 @@ export function SlotPage() {
           <Stack gap="md">
             <Title order={3}>Выберите дату</Title>
             <DatePicker
+              data-testid="calendar-panel"
               value={selectedDate}
               onChange={handleDateChange}
               minDate={today}
               maxDate={lastAvailableDay}
               excludeDate={(date) => !isInBookingWindow(date)}
+              getDayProps={getCalendarDayProps}
             />
           </Stack>
         </Paper>
@@ -137,6 +148,9 @@ export function SlotPage() {
                       key={slot.startTime}
                       component="button"
                       type="button"
+                      data-testid="slot-card"
+                      data-slot-start={slot.startTime}
+                      data-slot-status={slot.status}
                       withBorder
                       radius="md"
                       padding="md"

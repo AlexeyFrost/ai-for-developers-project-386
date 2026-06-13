@@ -1,6 +1,6 @@
 # E2E Scenarios
 
-This document describes the main frontend and backend integration scenarios that should later be covered by Playwright tests.
+This document describes the main frontend and backend integration scenarios covered by Playwright tests.
 
 ## Successful Booking Flow
 
@@ -44,7 +44,7 @@ Expected result:
 - The backend enforces the occupied-slot business rule.
 - The frontend correctly displays the occupied slot state or the error.
 
-## Notes For Future Playwright Implementation
+## Playwright Notes
 
 - Tests should run the real frontend and the real backend.
 - Prism mock API should not be used for E2E tests.

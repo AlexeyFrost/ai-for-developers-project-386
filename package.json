@@ -6,9 +6,12 @@
   "scripts": {
     "tsp:compile": "tsp compile spec/main.tsp",
     "openapi": "npm run tsp:compile",
-    "mock:api": "prism mock tsp-output/schema/openapi.yaml --host 0.0.0.0 --port 4010"
+    "mock:api": "prism mock tsp-output/schema/openapi.yaml --host 0.0.0.0 --port 4010",
+    "test:e2e": "playwright test",
+    "e2e:install": "playwright install --with-deps chromium"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@stoplight/prism-cli": "5.14.2",
     "@typespec/compiler": "^1.13.0",
     "@typespec/http": "^1.13.0",
