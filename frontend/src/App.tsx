@@ -7,6 +7,7 @@ import { ConfirmPage } from './pages/ConfirmPage';
 import { HomePage } from './pages/HomePage';
 import { SlotPage } from './pages/SlotPage';
 
+
 export default function App() {
   return (
     <>
