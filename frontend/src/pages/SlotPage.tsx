@@ -71,7 +71,7 @@ export function SlotPage() {
 
   const selectedDateKey = selectedDate ? toDateKey(selectedDate) : '';
   const visibleSlots = slots
-    .filter((slot) => getIsoDateKey(slot.startTime) === selectedDateKey)
+    .filter((slot) => slot.status === 'available' && getIsoDateKey(slot.startTime) === selectedDateKey)
     .sort((left, right) => left.startTime.localeCompare(right.startTime));
 
   const handleDateChange = (date: Date | null) => {
@@ -101,7 +101,7 @@ export function SlotPage() {
   return (
     <Stack gap="xl">
       <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
-        <Paper withBorder radius="lg" p="lg">
+        <Paper withBorder radius="lg" p="lg" className="booking-panel">
           <Stack gap="md">
             <Text c="dimmed">Встреча</Text>
             <Title order={2}>{eventType?.title}</Title>
@@ -117,7 +117,7 @@ export function SlotPage() {
           </Stack>
         </Paper>
 
-        <Paper withBorder radius="lg" p="lg" className="calendar-panel">
+        <Paper withBorder radius="lg" p="lg" className="booking-panel calendar-panel">
           <Stack gap="md">
             <Title order={3}>Выберите дату</Title>
             <DatePicker
@@ -128,19 +128,19 @@ export function SlotPage() {
               maxDate={lastAvailableDay}
               excludeDate={(date) => !isInBookingWindow(date)}
               getDayProps={getCalendarDayProps}
+              highlightToday
             />
           </Stack>
         </Paper>
 
-        <Paper withBorder radius="lg" p="lg">
-          <Stack gap="md">
-            <Title order={3}>Свободное время</Title>
+        <Paper withBorder radius="lg" p="lg" className="booking-panel booking-slots-panel">
+          <Stack gap="md" className="booking-slots-panel__content">
+            <Title order={3}>Выберите время</Title>
             {visibleSlots.length === 0 ? (
               <Alert color="gray">На выбранную дату нет слотов</Alert>
             ) : (
-              <Stack gap="sm">
+              <Stack gap="sm" className="booking-slots-panel__list">
                 {visibleSlots.map((slot) => {
-                  const isBooked = slot.status === 'booked';
                   const isSelected = selectedSlot?.startTime === slot.startTime;
 
                   return (
@@ -154,15 +154,12 @@ export function SlotPage() {
                       withBorder
                       radius="md"
                       padding="md"
-                      disabled={isBooked}
                       className={isSelected ? 'slot-card slot-card--selected' : 'slot-card'}
                       onClick={() => setSelectedSlot(slot)}
                     >
                       <Group justify="space-between">
                         <Text fw={600}>{formatSlotRange(slot)}</Text>
-                        <Badge color={isBooked ? 'gray' : 'green'} variant="light">
-                          {isBooked ? 'Занято' : 'Свободно'}
-                        </Badge>
+                        <Badge color="green" variant="light">Свободно</Badge>
                       </Group>
                     </Card>
                   );

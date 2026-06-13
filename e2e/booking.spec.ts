@@ -30,7 +30,7 @@ async function openEventTypeSlotPage(page: Page): Promise<void> {
   await page.goto('/');
   await page.getByRole('link', { name: 'Записаться' }).first().click();
 
-  await expect(page.getByRole('heading', { name: 'Alexey Morozov' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Вы записываетесь к Alexey Morozov' })).toBeVisible();
 
   const eventTypeLink = page.getByRole('link', { name: new RegExp(eventTitle) });
   await expect(eventTypeLink).toBeVisible();
@@ -39,7 +39,7 @@ async function openEventTypeSlotPage(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { name: eventTitle })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Выберите дату' })).toBeVisible();
   await expect(page.getByTestId('calendar-panel')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Свободное время' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выберите время' })).toBeVisible();
 }
 
 async function selectDate(page: Page, dateKey: string): Promise<void> {
@@ -134,7 +134,5 @@ test('booked slot is not available for another booking', async ({ page }) => {
   await selectDate(page, selectedSlot.startTime.slice(0, 10));
 
   const bookedSlot = page.locator(`[data-testid="slot-card"][data-slot-start="${selectedSlot.startTime}"]`);
-  await expect(bookedSlot).toContainText(selectedSlot.label);
-  await expect(bookedSlot).toContainText('Занято');
-  await expect(bookedSlot).toBeDisabled();
+  await expect(bookedSlot).toHaveCount(0);
 });

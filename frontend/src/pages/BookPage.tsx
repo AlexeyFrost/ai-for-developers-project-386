@@ -48,9 +48,10 @@ export function BookPage() {
   return (
     <Stack gap="xl">
       <Stack gap="xs">
-        <Text c="dimmed">Календарь владельца</Text>
-        <Title order={1}>{owner?.name}</Title>
-        {owner?.description ? <Text size="lg">{owner.description}</Text> : null}
+        <Title order={1} className="book-page-title">
+          Вы записываетесь к <span className="book-page-title__owner">{owner?.name}</span>
+        </Title>
+        <Title order={2} className="book-page-subtitle">Выберите подходящую вам продолжительность звонка</Title>
       </Stack>
 
       {eventTypes.length === 0 ? (

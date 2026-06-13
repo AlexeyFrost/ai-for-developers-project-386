@@ -88,8 +88,71 @@ body {
   box-shadow: 0 18px 40px rgba(30, 55, 120, 0.12);
 }
 
+.book-page-title {
+  font-size: calc(var(--mantine-h1-font-size) - 2px);
+}
+
+.book-page-title__owner {
+  color: #1c4ed8;
+}
+
+.book-page-subtitle {
+  color: #6b7280;
+  font-size: var(--mantine-font-size-xl);
+  font-weight: 600;
+}
+
+.booking-panel {
+  height: 500px;
+}
+
+.booking-slots-panel {
+  overflow: hidden;
+}
+
+.booking-slots-panel__content {
+  height: 100%;
+}
+
+.booking-slots-panel__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.booking-slots-panel__list .slot-card {
+  flex-shrink: 0;
+}
+
+.calendar-panel .mantine-DatePicker-root,
+.calendar-panel .mantine-DatePicker-calendar,
+.calendar-panel .mantine-DatePicker-month {
+  width: 100%;
+}
+
 .calendar-panel .mantine-DatePicker-calendarHeader {
+  width: 100%;
   max-width: 100%;
+}
+
+.calendar-panel .mantine-DatePicker-month {
+  table-layout: fixed;
+}
+
+.calendar-panel .mantine-DatePicker-day {
+  width: 100%;
+  font-size: 15px;
+}
+
+.calendar-panel .mantine-DatePicker-day[data-today][data-highlight-today]:not([data-selected]) {
+  border-color: #1c4ed8;
+  color: #1c4ed8;
+  font-weight: 700;
+}
+
+.calendar-panel .mantine-DatePicker-weekday {
+  font-size: 14px;
 }
 
 .slot-card {
@@ -103,8 +166,11 @@ body {
     transform 150ms ease;
 }
 
+.slot-card * {
+  cursor: inherit;
+}
+
 .slot-card:hover:not(:disabled) {
-  transform: translateY(-1px);
   border-color: #1c4ed8;
   background: #f7f9ff;
 }

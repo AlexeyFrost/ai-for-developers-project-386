@@ -13,9 +13,6 @@ export function HomePage() {
           <Button component={Link} to="/book" size="lg">
             Записаться
           </Button>
-          <Button component={Link} to="/admin" size="lg" variant="light">
-            Админка
-          </Button>
         </Group>
       </Stack>
     </Paper>
