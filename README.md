@@ -4,3 +4,7 @@
 ## Commit messages
 
 This project uses Conventional Commits. See [Commit convention](docs/commit-convention.md).
+
+## E2E scenarios
+
+Main integration scenarios are documented in [E2E scenarios](docs/e2e-scenarios.md).
