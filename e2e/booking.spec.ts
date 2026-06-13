@@ -1,6 +1,14 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
+const backendUrl = 'http://localhost:3001';
+const eventTypeId = 'meeting-30';
 const eventTitle = 'Встреча 30 минут';
+
+interface ApiSlot {
+  startTime: string;
+  endTime: string;
+  status: 'available' | 'booked';
+}
 
 interface SelectedSlot {
   label: string;
@@ -44,6 +52,39 @@ async function openEventTypeSlotPage(page: Page): Promise<void> {
 
 async function selectDate(page: Page, dateKey: string): Promise<void> {
   await page.locator(`[data-testid="calendar-day"][data-date="${dateKey}"]`).click();
+}
+
+async function listEventTypeSlots(page: Page): Promise<ApiSlot[]> {
+  const response = await page.request.get(`${backendUrl}/event-types/${eventTypeId}/slots`);
+  expect(response.status()).toBe(200);
+
+  return response.json() as Promise<ApiSlot[]>;
+}
+
+async function createBookingForSlot(page: Page, slot: ApiSlot, index: number): Promise<void> {
+  const response = await page.request.post(`${backendUrl}/bookings`, {
+    data: {
+      eventTypeId,
+      guestName: `E2E Filled Today ${index}`,
+      guestEmail: `filled.today.${index}@example.com`,
+      startTime: slot.startTime,
+    },
+  });
+
+  expect(response.status()).toBe(201);
+}
+
+async function fillTodayAvailableSlots(page: Page): Promise<string | null> {
+  const todayKey = getMoscowDateKey(0);
+  const slots = await listEventTypeSlots(page);
+  const todaySlots = slots.filter((slot) => slot.status === 'available' && slot.startTime.startsWith(todayKey));
+
+  for (const [index, slot] of todaySlots.entries()) {
+    await createBookingForSlot(page, slot, index);
+  }
+
+  const updatedSlots = await listEventTypeSlots(page);
+  return updatedSlots.find((slot) => slot.status === 'available')?.startTime.slice(0, 10) ?? null;
 }
 
 async function getSlotLabel(slot: Locator): Promise<string> {
@@ -104,6 +145,22 @@ async function createBooking(page: Page, guestName: string, guestEmail: string, 
 }
 
 test.describe.configure({ mode: 'serial' });
+
+test('selects the next available date when today has no slots', async ({ page }) => {
+  const todayKey = getMoscowDateKey(0);
+  const expectedDateKey = await fillTodayAvailableSlots(page);
+
+  test.skip(!expectedDateKey, 'No available slots left in the booking window');
+  if (!expectedDateKey) return;
+
+  expect(expectedDateKey).not.toBe(todayKey);
+
+  await openEventTypeSlotPage(page);
+
+  await expect(page.locator(`[data-testid="calendar-day"][data-date="${todayKey}"][data-selected]`)).toHaveCount(0);
+  await expect(page.locator(`[data-testid="calendar-day"][data-date="${expectedDateKey}"][data-selected]`)).toHaveCount(1);
+  await expect(page.getByTestId('slot-card').first()).toHaveAttribute('data-slot-start', new RegExp(`^${expectedDateKey}`));
+});
 
 test('user can book a meeting and see it in admin bookings', async ({ page }) => {
   const guestName = 'E2E Successful Guest';

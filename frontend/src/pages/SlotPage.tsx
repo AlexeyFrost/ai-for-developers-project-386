@@ -24,6 +24,20 @@ function getCalendarDayProps(date: Date): CalendarDayProps {
   } as unknown as CalendarDayProps;
 }
 
+function dateFromDateKey(dateKey: string): Date {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function getFirstAvailableSlotDate(slots: Slot[], today: Date): Date | null {
+  const todayKey = toDateKey(today);
+  const firstAvailableSlot = [...slots]
+    .filter((slot) => slot.status === 'available' && getIsoDateKey(slot.startTime) >= todayKey)
+    .sort((left, right) => left.startTime.localeCompare(right.startTime))[0];
+
+  return firstAvailableSlot ? dateFromDateKey(getIsoDateKey(firstAvailableSlot.startTime)) : null;
+}
+
 export function SlotPage() {
   const { eventTypeId } = useParams<{ eventTypeId: string }>();
   const navigate = useNavigate();
@@ -55,6 +69,8 @@ export function SlotPage() {
         setOwner(ownerData);
         setEventType(eventTypeData);
         setSlots(slotData);
+        setSelectedDate(getFirstAvailableSlotDate(slotData, today));
+        setSelectedSlot(null);
       } catch (error) {
         if (isMounted) setError(error instanceof ApiRequestError && error.status === 404 ? 'Тип записи не найден' : 'Не удалось загрузить слоты');
       } finally {
