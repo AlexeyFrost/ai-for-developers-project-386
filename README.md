@@ -5,6 +5,10 @@
 
 This project uses Conventional Commits. See [Commit convention](docs/commit-convention.md).
 
+## Releases
+
+Releases are automated with release-please. It creates or updates a release PR with the proposed version and changelog generated from Conventional Commits. Commit rules are documented in [Commit convention](docs/commit-convention.md).
+
 ## E2E scenarios
 
 Main integration scenarios are documented in [E2E scenarios](docs/e2e-scenarios.md).
