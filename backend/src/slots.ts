@@ -113,3 +113,7 @@ export function buildSlots(eventType: EventType, bookings: Booking[], now = new 
 
   return slots;
 }
+
+export function findGeneratedSlotByStartTime(eventType: EventType, bookings: Booking[], startTime: string, now = new Date()): Slot | undefined {
+  return buildSlots(eventType, bookings, now).find((slot) => slot.startTime === startTime);
+}

@@ -12,8 +12,7 @@ import {
 } from './store';
 import {
   buildSlots,
-  getBookingEndTime,
-  hasOverlappingBooking,
+  findGeneratedSlotByStartTime,
   isInsideBookingWindow,
   isInsideWorkingHours,
   isValidIsoDateTime,
@@ -140,8 +139,6 @@ router.post('/bookings', (req, res, next) => {
       throw notFound('Тип записи не найден');
     }
 
-    const endTime = getBookingEndTime(payload.startTime, eventType.durationMinutes);
-
     if (!isInsideBookingWindow(payload.startTime)) {
       throw validationError('Слот вне 14-дневного окна записи');
     }
@@ -150,11 +147,18 @@ router.post('/bookings', (req, res, next) => {
       throw validationError('Слот вне рабочего времени 09:00-18:00');
     }
 
-    if (hasOverlappingBooking(payload.startTime, endTime, listAllBookings())) {
+    const bookings = listAllBookings();
+    const slot = findGeneratedSlotByStartTime(eventType, bookings, payload.startTime);
+
+    if (!slot) {
+      throw validationError('Слот не совпадает с расписанием выбранного типа записи');
+    }
+
+    if (slot.status === 'booked') {
       throw conflict('Слот уже занят');
     }
 
-    res.status(201).json(createBooking(payload, eventType, endTime));
+    res.status(201).json(createBooking(payload, eventType, slot.endTime));
   } catch (error) {
     next(error);
   }
